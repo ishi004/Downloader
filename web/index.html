@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediaDock · 미디어 다운로드</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/"><span class="brand-icon">↓</span><span data-app-name>MediaDock</span></a>
+  <span class="workspace-label">MY WORKSPACE</span>
+  <nav aria-label="주 메뉴">
+    <button class="nav-item active" data-view="all"><span>▦</span>다운로드<span id="nav-count" class="nav-count">0</span></button>
+    <button class="nav-item" data-view="active"><span>◷</span>작업 대기열</button>
+    <button class="nav-item" data-view="completed"><span>✓</span>완료한 파일</button>
+    <button class="nav-item" id="settings-nav"><span>⚙</span>저장 설정</button>
+  </nav>
+  <div class="sidebar-bottom"><div class="engine-mark"><span class="status-dot"></span> LOCAL ENGINE</div><p>내 컴퓨터에서 실행 중</p><small>다운로드와 변환은 이 컴퓨터의<br>CPU·디스크·네트워크를 사용합니다.</small><button id="tools-open" class="engine-link">도구 버전 및 상태 ↗</button></div>
+</aside>
+<div class="workspace">
+  <header class="topbar"><div><span class="breadcrumb">내 작업 공간</span><span class="slash">/</span><strong>미디어 다운로드</strong></div><div class="topbar-actions"><button id="mobile-tools-open" class="text-button">엔진 상태</button><span id="connection" class="local-badge"><span class="status-dot"></span>로컬 전용</span></div></header>
+  <main>
+    <section class="page-heading"><div><p class="eyebrow">YOUR MEDIA, YOUR SPACE</p><h1>미디어 다운로드<span class="heading-dot">.</span></h1><p class="muted">링크를 붙여넣고, 원하는 형식으로 보관하세요.</p></div><div class="heading-chip">yt-dlp <span>+</span> FFmpeg</div></section>
+    <section class="stats" aria-label="실제 작업 통계">
+      <div class="stat-card"><span class="stat-icon lavender">↓</span><div><span class="stat-label">진행 중</span><strong id="stat-active">0</strong></div><span class="stat-foot">다운로드 · 변환</span></div>
+      <div class="stat-card"><span class="stat-icon peach">◷</span><div><span class="stat-label">대기 중</span><strong id="stat-queued">0</strong></div><span class="stat-foot">다음 순서</span></div>
+      <div class="stat-card"><span class="stat-icon mint">✓</span><div><span class="stat-label">완료한 작업</span><strong id="stat-completed">0</strong></div><span class="stat-foot">보관된 기록</span></div>
+      <div class="stat-card"><span class="stat-icon blue">▤</span><div><span class="stat-label">누적 저장 용량</span><strong class="size-stat" id="stat-bytes">0 B</strong></div><span class="stat-foot">완료 시 파일 크기</span></div>
+    </section>
+    <div id="system-error" class="notice error" hidden></div>
+    <div class="dashboard-grid">
+      <div class="main-column">
+        <section class="card composer" id="composer">
+          <div class="card-heading"><div><span class="section-icon">↗</span><h2>새 다운로드</h2></div><span class="subtle-label">여러 링크도 한 번에</span></div>
+          <label class="sr-only" for="urls">다운로드할 링크</label>
+          <textarea id="urls" rows="3" placeholder="영상 또는 재생목록 링크를 붙여넣으세요&#10;여러 링크는 줄바꿈으로 구분합니다." spellcheck="false"></textarea>
+          <div class="input-actions"><span class="helper">링크를 입력하면 정보를 자동으로 조회합니다.</span><button id="inspect" class="primary">링크 조회 <span>→</span></button></div>
+          <div class="composer-separator"></div>
+          <div class="defaults-bar"><span class="muted">새 항목 기본 형식</span><div class="segmented" aria-label="기본 다운로드 종류"><button id="default-video" class="selected" aria-pressed="true">영상</button><button id="default-audio" aria-pressed="false">음원</button></div><span id="default-summary" class="helper">원본 화질 · 자동</span></div>
+          <div id="inspection-status" class="inline-status" role="status" hidden></div>
+          <div id="results" class="results"></div>
+          <div id="queue-actions" class="queue-actions" hidden><label class="check"><input id="select-all" type="checkbox" checked>전체 선택</label><span id="selected-count" class="muted"></span><button id="enqueue" class="primary">선택 항목 다운로드 ↓</button></div>
+        </section>
+        <section class="card history" id="history-section">
+          <div class="card-heading"><div><h2 id="history-title">다운로드 내역</h2><span id="history-count" class="count-pill">0</span></div><span class="helper">완료 파일과 기록은 유지됩니다</span></div>
+          <div class="history-toolbar"><div class="filter-tabs" aria-label="작업 필터"><button class="active" data-filter="all">전체</button><button data-filter="active">진행·대기</button><button data-filter="completed">완료</button><button data-filter="issues">실패·취소</button></div></div>
+          <div id="history"><div class="empty-state"><div class="empty-icon">↓</div><h3>첫 번째 미디어를 보관해 보세요</h3><p>위에 링크를 입력하면 이곳에서<br>다운로드 진행 상황과 완료 파일을 확인할 수 있어요.</p></div></div>
+        </section>
+        <p class="footnote">본인이 소유하거나 다운로드 권한을 가진 미디어에 사용하세요.</p>
+      </div>
+      <aside class="settings-column">
+        <section class="card settings-card" id="settings-card">
+          <div class="card-heading"><div><span class="section-icon">⚙</span><h2>저장 설정</h2></div><span class="small-tag">LOCAL</span></div>
+          <form id="settings-form">
+            <label class="field">저장 위치<input id="save-dir" required placeholder="C:\MediaDock\downloads"><span class="helper">백엔드가 실행되는 컴퓨터의 폴더</span></label>
+            <div class="disk-space"><span>사용 가능한 공간</span><strong id="free-space">확인 중</strong></div>
+            <label class="field">하위 폴더<input id="subfolder" placeholder="예: 강의 / 디자인"><span class="helper">비워 두면 저장 위치에 바로 보관합니다.</span></label>
+            <label class="check switch-row"><span>채널별 폴더로 분류</span><input id="by-channel" type="checkbox" role="switch"></label>
+            <label class="field">파일명 규칙<input id="filename" required><span class="helper">{title} · {id} · {channel} · {date}<br>덮어쓰기를 막는 작업 ID가 뒤에 붙습니다.</span></label>
+            <div class="settings-divider"></div>
+            <h3>작업 제한</h3><div class="two-fields"><label class="field">동시 작업<select id="concurrency"><option value="1">1개</option><option value="2">2개</option><option value="3">3개</option><option value="4">4개</option></select></label><label class="field">작업당 속도 · KiB/s<input id="speed" type="number" min="0" max="1048576" step="1"></label></div>
+            <p class="helper limit-note">0은 속도 제한 없음. 속도 변경은 다음에 시작하는 작업부터 적용됩니다.</p>
+            <label class="check switch-row"><span>출력 옵션 기억하기</span><input id="remember" type="checkbox" role="switch"></label>
+            <details class="app-settings"><summary>앱 이름 및 포트</summary><label class="field">앱 이름<input id="app-name" maxlength="40" required></label><label class="field">포트<input id="port" type="number" min="1024" max="65535" required><span class="helper">포트 변경 후에는 앱을 다시 실행하세요.</span></label></details>
+            <button class="secondary save-button" type="submit">설정 저장</button><p id="settings-message" class="helper" role="status"></p>
+          </form>
+        </section>
+        <div class="local-note"><span class="note-icon">i</span><div><strong>내 컴퓨터에 안전하게 보관</strong><p>이 컴퓨터의 CPU·디스크·네트워크로 다운로드·변환합니다. 파일은 로컬 폴더에 저장되며, 브라우저를 닫아도 앱이 실행 중이면 작업은 계속됩니다.</p></div></div>
+      </aside>
+    </div>
+  </main>
+</div>
+<div id="toast" class="toast" role="status" hidden></div>
+<dialog id="tools-dialog"><div class="dialog-heading"><h2>로컬 엔진 상태</h2><button id="tools-close" class="icon-button" aria-label="닫기">×</button></div><p class="muted">실제로 설치된 도구와 지원 기능입니다.</p><pre id="tools-info"></pre><a href="https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md" target="_blank" rel="noreferrer">yt-dlp 지원 사이트 보기 ↗</a></dialog>
+</body></html>

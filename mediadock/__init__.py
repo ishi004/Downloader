@@ -1,0 +1,1 @@
+"""MediaDock local media workspace."""

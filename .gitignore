@@ -1,0 +1,10 @@
+.venv/
+tools/
+data/
+downloads/
+config.json
+__pycache__/
+.pytest_cache/
+test-results/
+node_modules/
+*.log
